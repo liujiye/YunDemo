@@ -1,0 +1,46 @@
+[
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/abc_primary_text_disable_only_material_dark.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/abc_primary_text_disable_only_material_dark.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/abc_primary_text_material_dark.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/abc_primary_text_material_dark.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/abc_secondary_text_material_light.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/abc_secondary_text_material_light.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/abc_primary_text_disable_only_material_light.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/abc_primary_text_disable_only_material_light.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/abc_primary_text_material_light.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/abc_primary_text_material_light.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/switch_thumb_material_dark.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/switch_thumb_material_dark.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/switch_thumb_material_light.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/switch_thumb_material_light.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/color_green_text_view_selector.xml",
+        "source": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/res/color/color_green_text_view_selector.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/color_picker_preview_selector.xml",
+        "source": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/res/color/color_picker_preview_selector.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/abc_secondary_text_material_dark.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/abc_secondary_text_material_dark.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/release/color/abc_search_url_text.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/color/abc_search_url_text.xml"
+    }
+]

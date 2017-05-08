@@ -1,0 +1,66 @@
+[
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_slide_in_bottom.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_slide_in_bottom.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/design_bottom_sheet_slide_out.xml",
+        "source": "/Users/liujiye/.android/build-cache/1627ce99dd09b6425cd0d49f951b33514b5a4201/output/res/anim/design_bottom_sheet_slide_out.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_slide_in_top.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_slide_in_top.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_popup_enter.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_popup_enter.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_slide_out_top.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_slide_out_top.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/design_snackbar_in.xml",
+        "source": "/Users/liujiye/.android/build-cache/1627ce99dd09b6425cd0d49f951b33514b5a4201/output/res/anim/design_snackbar_in.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_slide_out_bottom.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_slide_out_bottom.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_shrink_fade_out_from_bottom.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_shrink_fade_out_from_bottom.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_fade_in.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_fade_in.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_fade_out.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_fade_out.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_grow_fade_in_from_bottom.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_grow_fade_in_from_bottom.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/abc_popup_exit.xml",
+        "source": "/Users/liujiye/.android/build-cache/2d8070c37f5a9d8da21f940bc602f13e6e769502/output/res/anim/abc_popup_exit.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/design_bottom_sheet_slide_in.xml",
+        "source": "/Users/liujiye/.android/build-cache/1627ce99dd09b6425cd0d49f951b33514b5a4201/output/res/anim/design_bottom_sheet_slide_in.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/design_fab_in.xml",
+        "source": "/Users/liujiye/.android/build-cache/1627ce99dd09b6425cd0d49f951b33514b5a4201/output/res/anim/design_fab_in.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/design_fab_out.xml",
+        "source": "/Users/liujiye/.android/build-cache/1627ce99dd09b6425cd0d49f951b33514b5a4201/output/res/anim/design_fab_out.xml"
+    },
+    {
+        "merged": "/Users/liujiye/workspace/android/YunDemo/demo/uikit/build/intermediates/res/merged/androidTest/debug/anim/design_snackbar_out.xml",
+        "source": "/Users/liujiye/.android/build-cache/1627ce99dd09b6425cd0d49f951b33514b5a4201/output/res/anim/design_snackbar_out.xml"
+    }
+]
