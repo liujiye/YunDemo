@@ -1,19 +1,32 @@
 package com.demo.yun.activity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.demo.yun.R;
 import com.demo.yun.entity.AppData;
+import com.demo.yun.session.action.AVChatAction;
+import com.demo.yun.session.action.FileAction;
+import com.demo.yun.session.action.GuessAction;
+import com.demo.yun.session.action.SnapChatAction;
 import com.demo.yun.theApp;
 import com.demo.yun.util.YunXinUtil;
 import com.netease.nim.uikit.NimUIKit;
+import com.netease.nim.uikit.session.SessionCustomization;
+import com.netease.nim.uikit.session.actions.BaseAction;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.RequestCallback;
 import com.netease.nimlib.sdk.auth.AuthService;
 import com.netease.nimlib.sdk.auth.LoginInfo;
+import com.netease.nimlib.sdk.avchat.constant.AVChatType;
+import com.netease.nimlib.sdk.msg.attachment.MsgAttachment;
+import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
+
+import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity
 {
@@ -24,7 +37,8 @@ public class LoginActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        View.OnClickListener clickListener = new View.OnClickListener() {
+        View.OnClickListener clickListener = new View.OnClickListener()
+        {
             @Override
             public void onClick(View v)
             {
@@ -89,7 +103,10 @@ public class LoginActivity extends AppCompatActivity
         {
             //启动单聊界面
             NimUIKit.setAccount(AppData.getYunXinAccount());
-            NimUIKit.startP2PSession(this, "test003");
+            SessionCustomization customization = customP2PChatOptions();
+            //NimUIKit.startP2PSession(this, "test003");
+            // 启动单聊
+            NimUIKit.startChatting(this, "test003", SessionTypeEnum.P2P, customization, null);
         }
         catch (Exception e)
         {
@@ -101,7 +118,6 @@ public class LoginActivity extends AppCompatActivity
     {
 
     }
-
 
 
     private void onYunXinLogin()
@@ -145,5 +161,93 @@ public class LoginActivity extends AppCompatActivity
             e.printStackTrace();
             theApp.showToast("Exception " + e.toString());
         }
+    }
+
+    private SessionCustomization customP2PChatOptions()
+    {
+        // 设置单聊界面定制
+        SessionCustomization commonP2PSessionCustomization = getMyP2pCustomization();
+        NimUIKit.setCommonP2PSessionCustomization(commonP2PSessionCustomization);
+        return commonP2PSessionCustomization;
+    }
+
+    private static SessionCustomization getMyP2pCustomization()
+    {
+        SessionCustomization myP2pCustomization = null;
+        if (myP2pCustomization == null)
+        {
+            myP2pCustomization = initBaseP2P();
+
+            // 定制ActionBar右边的按钮，可以加多个
+            ArrayList<SessionCustomization.OptionsButton> buttons = new ArrayList<>();
+//            OptionsButton cloudMsgButton = new OptionsButton() {
+//                @Override
+//                public void onClick(Context context, View view, String sessionId)
+//                {
+//                    //MessageHistoryActivity.start(context, sessionId, SessionTypeEnum.P2P); // 漫游消息查询
+//                }
+//            };
+//            cloudMsgButton.iconId = R.drawable.nim_ic_messge_history;
+//
+//            buttons.add(cloudMsgButton);
+            myP2pCustomization.buttons = buttons;
+        }
+        return myP2pCustomization;
+    }
+
+    private static SessionCustomization initBaseP2P()
+    {
+        SessionCustomization sessionCustomization = new SessionCustomization()
+        {
+            // 由于需要Activity Result， 所以重载该函数。
+            @Override
+            public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data)
+            {
+//                if (requestCode == NormalTeamInfoActivity.REQUEST_CODE && resultCode == Activity.RESULT_OK)
+//                {
+//                    String result = data.getStringExtra(NormalTeamInfoActivity.RESULT_EXTRA_REASON);
+//                    if (result == null)
+//                    {
+//                        return;
+//                    }
+//                    if (result.equals(NormalTeamInfoActivity.RESULT_EXTRA_REASON_CREATE))
+//                    {
+//                        String tid = data.getStringExtra(NormalTeamInfoActivity.RESULT_EXTRA_DATA);
+//                        if (TextUtils.isEmpty(tid))
+//                        {
+//                            return;
+//                        }
+//
+//                        startTeamSession(activity, tid);
+//                        activity.finish();
+//                    }
+//                }
+            }
+
+            @Override
+            public MsgAttachment createStickerAttachment(String category, String item)
+            {
+                //return new StickerAttachment(category, item);
+                return null;
+            }
+        };
+
+        // 背景
+        sessionCustomization.backgroundColor = Color.BLUE;
+        sessionCustomization.backgroundUri = "file:///android_asset/xx/bk.jpg";
+        sessionCustomization.backgroundUri = "file:///sdcard/Pictures/bk.png";
+        sessionCustomization.backgroundUri = "android.resource://com.netease.nim.demo/drawable/bk";
+
+        // 定制加号点开后可以包含的操作，默认已经有图片，视频等消息了，如果要去掉默认的操作，请修改MessageFragment的getActionList函数
+        ArrayList<BaseAction> actions = new ArrayList<>();
+        actions.add(new AVChatAction(AVChatType.AUDIO));
+        actions.add(new AVChatAction(AVChatType.VIDEO));
+        actions.add(new SnapChatAction());
+        actions.add(new GuessAction());
+        actions.add(new FileAction());
+        sessionCustomization.actions = actions;
+        sessionCustomization.withSticker = true;
+
+        return sessionCustomization;
     }
 }
