@@ -3,6 +3,7 @@ package com.demo.yun.session.action;
 import android.widget.Toast;
 
 import com.demo.yun.R;
+import com.demo.yun.avchat.AVChatActivity;
 import com.netease.nim.uikit.common.util.sys.NetworkUtil;
 import com.netease.nim.uikit.session.actions.BaseAction;
 import com.netease.nimlib.sdk.avchat.constant.AVChatType;
@@ -38,6 +39,6 @@ public class AVChatAction extends BaseAction
 
     public void startAudioVideoCall(AVChatType avChatType)
     {
-        //AVChatActivity.launch(getActivity(), getAccount(), avChatType.getValue(), AVChatActivity.FROM_INTERNAL);
+        AVChatActivity.launch(getActivity(), getAccount(), avChatType.getValue(), AVChatActivity.FROM_INTERNAL);
     }
 }

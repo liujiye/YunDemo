@@ -125,8 +125,8 @@ public class LoginActivity extends AppCompatActivity
         try
         {
             // String strToken = MD5.getStringMD5("123456");
-            String strAccount = "test003";
-            String strToken = "1c641f3af395c4734afe3786ba818d63";
+            String strAccount = theApp.ACCOUNT;
+            String strToken = theApp.TOKEN;
             LoginInfo info = new LoginInfo(strAccount, strToken, YunXinUtil.APP_KEY); // config...
             RequestCallback<LoginInfo> callback =
                     new RequestCallback<LoginInfo>()
@@ -166,17 +166,17 @@ public class LoginActivity extends AppCompatActivity
     private SessionCustomization customP2PChatOptions()
     {
         // 设置单聊界面定制
-        SessionCustomization commonP2PSessionCustomization = getMyP2pCustomization();
-        NimUIKit.setCommonP2PSessionCustomization(commonP2PSessionCustomization);
-        return commonP2PSessionCustomization;
+        SessionCustomization sessionCustomization = getP2pCustomization();
+        NimUIKit.setCommonP2PSessionCustomization(sessionCustomization);
+        return sessionCustomization;
     }
 
-    private static SessionCustomization getMyP2pCustomization()
+    private static SessionCustomization getP2pCustomization()
     {
-        SessionCustomization myP2pCustomization = null;
-        if (myP2pCustomization == null)
+        SessionCustomization sessionCustomization = null;
+        if (sessionCustomization == null)
         {
-            myP2pCustomization = initBaseP2P();
+            sessionCustomization = initBaseP2P();
 
             // 定制ActionBar右边的按钮，可以加多个
             ArrayList<SessionCustomization.OptionsButton> buttons = new ArrayList<>();
@@ -190,9 +190,9 @@ public class LoginActivity extends AppCompatActivity
 //            cloudMsgButton.iconId = R.drawable.nim_ic_messge_history;
 //
 //            buttons.add(cloudMsgButton);
-            myP2pCustomization.buttons = buttons;
+            sessionCustomization.buttons = buttons;
         }
-        return myP2pCustomization;
+        return sessionCustomization;
     }
 
     private static SessionCustomization initBaseP2P()

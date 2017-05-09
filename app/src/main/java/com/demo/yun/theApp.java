@@ -17,6 +17,8 @@ import com.netease.nimlib.sdk.NIMClient;
 public class theApp extends Application
 {
     public static Context CONTEXT;
+    public static final String ACCOUNT = "test003";
+    public static final String TOKEN = "1c641f3af395c4734afe3786ba818d63";
 
     @Override
     public void onCreate()

@@ -1,6 +1,8 @@
 package com.demo.yun.avchat;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -53,6 +55,17 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener
     private boolean isCallEstablished = false; // 电话是否接通
     private static boolean needFinish = true; // 若来电或去电未接通时，点击home。另外一方挂断通话。从最近任务列表恢复，则finish
     private boolean hasOnPause = false; // 是否暂停音视频
+
+    public static void launch(Context context, String account, int callType, int source) {
+        needFinish = false;
+        Intent intent = new Intent();
+        intent.setClass(context, AVChatActivity.class);
+        intent.putExtra(KEY_ACCOUNT, account);
+        intent.putExtra(KEY_IN_CALLING, false);
+        intent.putExtra(KEY_CALL_TYPE, callType);
+        intent.putExtra(KEY_SOURCE, source);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
