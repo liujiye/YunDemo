@@ -1,19 +1,30 @@
 package com.demo.yun.avchat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
+import android.widget.Toast;
 
 import com.demo.yun.R;
+import com.demo.yun.constant.CallStateEnum;
+import com.demo.yun.theApp;
+import com.netease.nim.uikit.common.ui.dialog.DialogMaker;
+import com.netease.nim.uikit.common.util.log.LogUtil;
+import com.netease.nim.uikit.permission.BaseMPermission;
+import com.netease.nimlib.sdk.ResponseCode;
+import com.netease.nimlib.sdk.avchat.AVChatCallback;
+import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.constant.AVChatAudioEffectMode;
 import com.netease.nimlib.sdk.avchat.constant.AVChatMediaCodecMode;
 import com.netease.nimlib.sdk.avchat.constant.AVChatType;
 import com.netease.nimlib.sdk.avchat.constant.AVChatUserRole;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
+import com.netease.nimlib.sdk.avchat.model.AVChatNotifyOption;
 import com.netease.nimlib.sdk.avchat.model.AVChatParameters;
 
 import java.util.LinkedList;
@@ -36,11 +47,11 @@ public class AVChatUI implements AVChatUIListener
     private String receiverId;
     //private AVChatAudio avChatAudio;
     //private AVChatVideo avChatVideo;
-    //private AVChatSurface avChatSurface;
+    private AVChatSurface avChatSurface;
     private AVChatParameters avChatParameters;
     private String videoAccount; // 发送视频请求，onUserJoin回调的user account
 
-    //private CallStateEnum callingState = CallStateEnum.INVALID;
+    private CallStateEnum callingState = CallStateEnum.INVALID;
 
     private long timeBase = 0;
 
@@ -62,12 +73,14 @@ public class AVChatUI implements AVChatUIListener
 
     List<Pair<String, Boolean>> recordList = new LinkedList<Pair<String, Boolean>>();
 
-    public interface AVChatListener {
+    public interface AVChatListener
+    {
         void uiExit();
     }
 
 
-    public AVChatUI(Context context, View root, AVChatListener listener) {
+    public AVChatUI(Context context, View root, AVChatListener listener)
+    {
         this.context = context;
         this.root = root;
         this.aVChatListener = listener;
@@ -96,7 +109,8 @@ public class AVChatUI implements AVChatUIListener
     private boolean audioHighQuality;
     private boolean audioDtx;
 
-    private void configFromPreference(SharedPreferences preferences) {
+    private void configFromPreference(SharedPreferences preferences)
+    {
         videoCropRatio = Integer.parseInt(preferences.getString(context.getString(
                 R.string.nrtc_setting_vie_crop_ratio_key), "0"));
         videoAutoRotate = preferences.getBoolean(context.getString(R.string.nrtc_setting_vie_rotation_key), true);
@@ -141,7 +155,8 @@ public class AVChatUI implements AVChatUIListener
      * 16, audioHighQuality: 高清语音，采用更高的采样率来传输语音
      * 17, audioDtx: 非连续发送，当监测到人声非活跃状态时减少数据包的发送
      */
-    private void updateAVChatOptionalConfig() {
+    private void updateAVChatOptionalConfig()
+    {
         avChatParameters.setBoolean(AVChatParameters.KEY_AUDIO_CALL_PROXIMITY, autoCallProximity);
         avChatParameters.setInteger(AVChatParameters.KEY_VIDEO_FIXED_CROP_RATIO, videoCropRatio);
         avChatParameters.setBoolean(AVChatParameters.KEY_VIDEO_ROTATE_IN_RENDING, videoAutoRotate);
@@ -153,10 +168,12 @@ public class AVChatUI implements AVChatUIListener
         avChatParameters.setInteger(AVChatParameters.KEY_DEVICE_DEFAULT_ROTATION, deviceDefaultRotation);
         avChatParameters.setInteger(AVChatParameters.KEY_DEVICE_ROTATION_FIXED_OFFSET, deviceRotationOffset);
 
-        if (videoMaxBitrate > 0) {
+        if (videoMaxBitrate > 0)
+        {
             avChatParameters.setInteger(AVChatParameters.KEY_VIDEO_MAX_BITRATE, videoMaxBitrate * 1024);
         }
-        switch (audioEffectAecMode) {
+        switch (audioEffectAecMode)
+        {
         case 0:
             avChatParameters.setString(AVChatParameters.KEY_AUDIO_EFFECT_ACOUSTIC_ECHO_CANCELER, AVChatAudioEffectMode.DISABLE);
             break;
@@ -167,7 +184,8 @@ public class AVChatUI implements AVChatUIListener
             avChatParameters.setString(AVChatParameters.KEY_AUDIO_EFFECT_ACOUSTIC_ECHO_CANCELER, AVChatAudioEffectMode.PLATFORM_BUILTIN);
             break;
         }
-        switch (audioEffectNsMode) {
+        switch (audioEffectNsMode)
+        {
         case 0:
             avChatParameters.setString(AVChatParameters.KEY_AUDIO_EFFECT_NOISE_SUPPRESSOR, AVChatAudioEffectMode.DISABLE);
             break;
@@ -178,7 +196,8 @@ public class AVChatUI implements AVChatUIListener
             avChatParameters.setString(AVChatParameters.KEY_AUDIO_EFFECT_NOISE_SUPPRESSOR, AVChatAudioEffectMode.PLATFORM_BUILTIN);
             break;
         }
-        switch (videoHwEncoderMode) {
+        switch (videoHwEncoderMode)
+        {
         case 0:
             avChatParameters.setString(AVChatParameters.KEY_VIDEO_ENCODER_MODE, AVChatMediaCodecMode.MEDIA_CODEC_AUTO);
             break;
@@ -189,7 +208,8 @@ public class AVChatUI implements AVChatUIListener
             avChatParameters.setString(AVChatParameters.KEY_VIDEO_ENCODER_MODE, AVChatMediaCodecMode.MEDIA_CODEC_HARDWARE);
             break;
         }
-        switch (videoHwDecoderMode) {
+        switch (videoHwDecoderMode)
+        {
         case 0:
             avChatParameters.setString(AVChatParameters.KEY_VIDEO_DECODER_MODE, AVChatMediaCodecMode.MEDIA_CODEC_AUTO);
             break;
@@ -217,7 +237,7 @@ public class AVChatUI implements AVChatUIListener
         //AVChatProfile.getInstance().setAVChatting(true);
         //avChatAudio = new AVChatAudio(context,root.findViewById(R.id.avchat_audio_layout), this, this);
         //avChatVideo = new AVChatVideo(context, root.findViewById(R.id.avchat_video_layout), this, this);
-        //avChatSurface = new AVChatSurface(context, this, root.findViewById(R.id.avchat_surface_layout));
+        avChatSurface = new AVChatSurface(context, this, root.findViewById(R.id.avchat_surface_layout));
 
         return true;
     }
@@ -226,19 +246,226 @@ public class AVChatUI implements AVChatUIListener
     /**
      * 来电
      */
-    public void inComingCalling(AVChatData avChatData) {
+    public void inComingCalling(AVChatData avChatData)
+    {
         this.avChatData = avChatData;
         receiverId = avChatData.getAccount();
 
         //AVChatSoundPlayer.instance().play(AVChatSoundPlayer.RingerTypeEnum.RING);
 
-        if (avChatData.getChatType() == AVChatType.AUDIO) {
+        if (avChatData.getChatType() == AVChatType.AUDIO)
+        {
             //onCallStateChange(CallStateEnum.INCOMING_AUDIO_CALLING);
-        } else {
+        }
+        else
+        {
             //onCallStateChange(CallStateEnum.INCOMING_VIDEO_CALLING);
         }
     }
 
+    /**
+     * 拨打音视频
+     */
+    public void outGoingCalling(String account, final AVChatType callTypeEnum)
+    {
+
+        DialogMaker.showProgressDialog(context, null);
+
+        AVChatSoundPlayer.instance().play(AVChatSoundPlayer.RingerTypeEnum.CONNECTING);
+
+        this.receiverId = account;
+
+        AVChatNotifyOption notifyOption = new AVChatNotifyOption();
+        notifyOption.extendMessage = "extra_data";
+//        默认forceKeepCalling为true，开发者如果不需要离线持续呼叫功能可以将forceKeepCalling设为false
+//        notifyOption.forceKeepCalling = false;
+
+        AVChatManager.getInstance().enableRtc();
+        this.callingState = (callTypeEnum == AVChatType.VIDEO ? CallStateEnum.VIDEO : CallStateEnum.AUDIO);
+        AVChatManager.getInstance().setParameters(avChatParameters);
+        if (callTypeEnum == AVChatType.VIDEO)
+        {
+            AVChatManager.getInstance().enableVideo();
+            AVChatManager.getInstance().startVideoPreview();
+        }
+
+        AVChatManager.getInstance().call2(account, callTypeEnum, notifyOption, new AVChatCallback<AVChatData>()
+        {
+            @Override
+            public void onSuccess(AVChatData data)
+            {
+                avChatData = data;
+                DialogMaker.dismissProgressDialog();
+                //如果需要使用视频预览功能，在此进行设置，调用setupLocalVideoRender
+                //如果不需要视频预览功能，那么删掉下面if语句代码即可
+                if (callTypeEnum == AVChatType.VIDEO)
+                {
+                    List<String> deniedPermissions = BaseMPermission.getDeniedPermissions((Activity) context, BASIC_PERMISSIONS);
+                    if (deniedPermissions != null && !deniedPermissions.isEmpty())
+                    {
+                        //avChatVideo.showNoneCameraPermissionView(true);
+                        return;
+                    }
+
+//                    initLargeSurfaceView(DemoCache.getAccount());
+                    initLargeSurfaceView(theApp.ACCOUNT);
+                    canSwitchCamera = true;
+                    onCallStateChange(CallStateEnum.OUTGOING_VIDEO_CALLING);
+                }
+            }
+
+            @Override
+            public void onFailed(int code)
+            {
+                LogUtil.d(TAG, "avChat call failed code->" + code);
+                DialogMaker.dismissProgressDialog();
+
+                AVChatSoundPlayer.instance().stop();
+
+                if (code == ResponseCode.RES_FORBIDDEN)
+                {
+                    Toast.makeText(context, R.string.avchat_no_permission, Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(context, R.string.avchat_call_failed, Toast.LENGTH_SHORT).show();
+                }
+                closeSessions(-1);
+            }
+
+            @Override
+            public void onException(Throwable exception)
+            {
+                LogUtil.d(TAG, "avChat call onException->" + exception);
+                DialogMaker.dismissProgressDialog();
+
+                AVChatSoundPlayer.instance().stop();
+            }
+        });
+
+        if (callTypeEnum == AVChatType.AUDIO)
+        {
+            onCallStateChange(CallStateEnum.OUTGOING_AUDIO_CALLING);
+        }
+        else
+        {
+            onCallStateChange(CallStateEnum.OUTGOING_VIDEO_CALLING);
+        }
+    }
+
+    public void initLargeSurfaceView(String account)
+    {
+        avChatSurface.initLargeSurfaceView(account);
+    }
+
+    /**
+     * 状态改变
+     *
+     * @param stateEnum
+     */
+    public void onCallStateChange(CallStateEnum stateEnum)
+    {
+        callingState = stateEnum;
+        avChatSurface.onCallStateChange(stateEnum);
+//        avChatAudio.onCallStateChange(stateEnum);
+//        avChatVideo.onCallStateChange(stateEnum);
+    }
+
+    /**
+     * 关闭本地音视频各项功能
+     *
+     * @param exitCode 音视频类型
+     */
+    public void closeSessions(int exitCode)
+    {
+        //not  user  hang up active  and warning tone is playing,so wait its end
+//        Log.i(TAG, "close session -> " + AVChatExitCode.getExitString(exitCode));
+//        if (avChatAudio != null)
+//            avChatAudio.closeSession(exitCode);
+//        if (avChatVideo != null)
+//            avChatVideo.closeSession(exitCode);
+        //showQuitToast(exitCode);
+        isCallEstablish.set(false);
+        canSwitchCamera = false;
+        isClosedCamera = false;
+        aVChatListener.uiExit();
+    }
+
+
+
+    public void peerVideoOff() {
+        avChatSurface.peerVideoOff();
+    }
+
+    public void peerVideoOn() {
+        avChatSurface.peerVideoOn();
+    }
+
+
+    private boolean needRestoreLocalVideo = false;
+    private boolean needRestoreLocalAudio = false;
+
+    //恢复视频和语音发送
+    public void resumeVideo() {
+        if (needRestoreLocalVideo) {
+            AVChatManager.getInstance().muteLocalVideo(false);
+            needRestoreLocalVideo = false;
+        }
+
+        if (needRestoreLocalAudio) {
+            AVChatManager.getInstance().muteLocalAudio(false);
+            needRestoreLocalAudio = false;
+        }
+
+    }
+
+    //关闭视频和语音发送.
+    public void pauseVideo() {
+
+        if (!AVChatManager.getInstance().isLocalVideoMuted()) {
+            AVChatManager.getInstance().muteLocalVideo(true);
+            needRestoreLocalVideo = true;
+        }
+
+        if (!AVChatManager.getInstance().isLocalAudioMuted()) {
+            AVChatManager.getInstance().muteLocalAudio(true);
+            needRestoreLocalAudio = true;
+        }
+    }
+
+    public boolean canSwitchCamera() {
+        return canSwitchCamera;
+    }
+
+    public CallStateEnum getCallingState() {
+        return callingState;
+    }
+
+    public String getVideoAccount() {
+        return videoAccount;
+    }
+
+    public void setVideoAccount(String videoAccount) {
+        this.videoAccount = videoAccount;
+    }
+
+    public String getAccount() {
+        if (receiverId != null)
+            return receiverId;
+        return null;
+    }
+
+    public long getTimeBase() {
+        return timeBase;
+    }
+
+    public void setTimeBase(long timeBase) {
+        this.timeBase = timeBase;
+    }
+
+    public AVChatData getAvChatData() {
+        return avChatData;
+    }
 
     @Override
     public void onHangUp()

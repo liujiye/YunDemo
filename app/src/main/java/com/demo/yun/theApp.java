@@ -3,6 +3,7 @@ package com.demo.yun;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
+import android.support.multidex.MultiDex;
 
 import com.demo.yun.util.UIUtil;
 import com.demo.yun.util.YunXinUtil;
@@ -19,6 +20,12 @@ public class theApp extends Application
     public static Context CONTEXT;
     public static final String ACCOUNT = "test003";
     public static final String TOKEN = "1c641f3af395c4734afe3786ba818d63";
+
+    protected void attachBaseContext(Context newBase)
+    {
+        super.attachBaseContext(newBase);
+        MultiDex.install(this);
+    }
 
     @Override
     public void onCreate()
@@ -43,6 +50,7 @@ public class theApp extends Application
 
 
     public static Handler sm_handler = new Handler();
+
     public static void showToast(final String strToast)
     {
         sm_handler.post(new Runnable()
