@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.demo.yun.R;
+import com.demo.yun.entity.Account;
 import com.demo.yun.entity.AppData;
 import com.demo.yun.session.action.AVChatAction;
 import com.demo.yun.session.action.FileAction;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity
 {
+    private Account mCurAccount = theApp.TEST3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +49,17 @@ public class LoginActivity extends AppCompatActivity
                 case R.id.btn_login:
                     onLogin();
                     break;
+                case R.id.btn_chat:
+                    onChat();
+                    break;
+                case R.id.rdo_test3:
+                    toggleButtonEnable(true);
+                    mCurAccount = theApp.TEST3;
+                    break;
+                case R.id.rdo_test4:
+                    toggleButtonEnable(true);
+                    mCurAccount = theApp.TEST4;
+                    break;
                 case R.id.btn_main:
                     onMain();
                     break;
@@ -56,27 +69,38 @@ public class LoginActivity extends AppCompatActivity
                 case R.id.btn_recent_contact:
                     onRecentContact();
                     break;
-                case R.id.btn_chat:
-                    onAudio();
-                    break;
-                case R.id.btn_video:
-                    onVideo();
-                    break;
                 }
             }
         };
 
         findViewById(R.id.btn_login).setOnClickListener(clickListener);
+        findViewById(R.id.btn_chat).setOnClickListener(clickListener);
         findViewById(R.id.btn_main).setOnClickListener(clickListener);
         findViewById(R.id.btn_recent_contact).setOnClickListener(clickListener);
-        findViewById(R.id.btn_chat).setOnClickListener(clickListener);
-        findViewById(R.id.btn_video).setOnClickListener(clickListener);
         findViewById(R.id.btn_contacts).setOnClickListener(clickListener);
+        findViewById(R.id.rdo_test3).setOnClickListener(clickListener);
+        findViewById(R.id.rdo_test4).setOnClickListener(clickListener);
+
+        findViewById(R.id.rdo_test3).performClick();
     }
 
     private void onLogin()
     {
-        onYunXinLogin();
+        onYunXinLogin(mCurAccount);
+    }
+
+    private void onChat()
+    {
+        String strAccount;
+        if (mCurAccount.getAccount().equals(theApp.TEST3.getAccount()))
+        {
+            strAccount = theApp.TEST4.getAccount();
+        }
+        else
+        {
+            strAccount = theApp.TEST3.getAccount();
+        }
+        chat(strAccount);
     }
 
     private void onMain()
@@ -97,7 +121,8 @@ public class LoginActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private void onAudio()
+    // account 对方的id
+    private void chat(String account)
     {
         try
         {
@@ -106,7 +131,7 @@ public class LoginActivity extends AppCompatActivity
             SessionCustomization customization = customP2PChatOptions();
             //NimUIKit.startP2PSession(this, "test003");
             // 启动单聊
-            NimUIKit.startChatting(this, "test003", SessionTypeEnum.P2P, customization, null);
+            NimUIKit.startChatting(this, account, SessionTypeEnum.P2P, customization, null);
         }
         catch (Exception e)
         {
@@ -114,19 +139,19 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    private void onVideo()
+    private void toggleButtonEnable(boolean enable)
     {
-
+        findViewById(R.id.btn_login).setEnabled(enable);
+        findViewById(R.id.btn_chat).setEnabled(!enable);
     }
 
-
-    private void onYunXinLogin()
+    private void onYunXinLogin(Account account)
     {
         try
         {
             // String strToken = MD5.getStringMD5("123456");
-            String strAccount = theApp.ACCOUNT;
-            String strToken = theApp.TOKEN;
+            String strAccount = account.getAccount();
+            String strToken = account.getToken();
             LoginInfo info = new LoginInfo(strAccount, strToken, YunXinUtil.APP_KEY); // config...
             RequestCallback<LoginInfo> callback =
                     new RequestCallback<LoginInfo>()
@@ -140,6 +165,8 @@ public class LoginActivity extends AppCompatActivity
                             NimUIKit.setAccount(loginInfo.getAccount());
                             AppData.setYunXinAccount(loginInfo.getAccount());
                             AppData.setYunXinToken(loginInfo.getToken());
+
+                            toggleButtonEnable(false);
                         }
 
                         @Override

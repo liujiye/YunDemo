@@ -179,7 +179,7 @@ public class AVChatVideo implements View.OnClickListener, ToggleListener
     private void showProfile()
     {
         //String account = manager.getAccount();
-        String account = theApp.ACCOUNT;
+        String account = theApp.TEST3.getAccount();
         headImg.loadBuddyAvatar(account);
         nickNameTV.setText(NimUserInfoCache.getInstance().getUserDisplayName(account));
     }

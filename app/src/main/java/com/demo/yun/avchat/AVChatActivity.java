@@ -12,7 +12,10 @@ import android.widget.Toast;
 import com.demo.yun.R;
 import com.demo.yun.avchat.receiver.PhoneCallStateObserver;
 import com.netease.nim.uikit.common.util.sys.NetworkUtil;
+import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
+import com.netease.nimlib.sdk.StatusCode;
+import com.netease.nimlib.sdk.auth.AuthServiceObserver;
 import com.netease.nimlib.sdk.auth.ClientType;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.AVChatStateObserver;
@@ -64,7 +67,7 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
     private AVChatUI avChatUI; // 音视频总管理器
     private AVChatData avChatData; // config for connect video server
     private int state; // calltype 音频或视频
-    private String receiverId; // 对方的account
+    private String receiverId = ""; // 对方的account
 
     // state
     private boolean isUserFinish = false;
@@ -72,6 +75,9 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
     private boolean isCallEstablished = false; // 电话是否接通
     private static boolean needFinish = true; // 若来电或去电未接通时，点击home。另外一方挂断通话。从最近任务列表恢复，则finish
     private boolean hasOnPause = false; // 是否暂停音视频
+
+    // notification
+    private AVChatNotification notifier;
 
     public static void launch(Context context, String account, int callType, int source)
     {
@@ -89,6 +95,12 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        if (needFinish || !checkSource())
+        {
+            finish();
+            return;
+        }
+
         View root = LayoutInflater.from(this).inflate(R.layout.activity_avchat, null);
         setContentView(root);
         mIsInComingCall = getIntent().getBooleanExtra(KEY_IN_CALLING, false);
@@ -110,6 +122,47 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
         }
     }
 
+    /**
+     * 判断来电还是去电
+     *
+     * @return
+     */
+    private boolean checkSource()
+    {
+        switch (getIntent().getIntExtra(KEY_SOURCE, FROM_UNKNOWN))
+        {
+        case FROM_BROADCASTRECEIVER: // incoming call
+            parseIncomingIntent();
+            return true;
+        case FROM_INTERNAL: // outgoing call
+            parseOutgoingIntent();
+            if (state == AVChatType.VIDEO.getValue() || state == AVChatType.AUDIO.getValue())
+            {
+                return true;
+            }
+            return false;
+        default:
+            return false;
+        }
+    }
+
+    /**
+     * 来电参数解析
+     */
+    private void parseIncomingIntent()
+    {
+        avChatData = (AVChatData) getIntent().getSerializableExtra(KEY_CALL_CONFIG);
+        state = avChatData.getChatType().getValue();
+    }
+
+    /**
+     * 去电参数解析
+     */
+    private void parseOutgoingIntent()
+    {
+        receiverId = getIntent().getStringExtra(KEY_ACCOUNT);
+        state = getIntent().getIntExtra(KEY_CALL_TYPE, -1);
+    }
 
     /**
      * 接听
@@ -125,7 +178,8 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
     private void outgoingCalling()
     {
         if (!NetworkUtil.isNetAvailable(AVChatActivity.this))
-        { // 网络不可用
+        {
+            // 网络不可用
             Toast.makeText(this, R.string.network_is_not_available, Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -157,20 +211,23 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
         @Override
         public void onEvent(AVChatCalleeAckEvent ackInfo)
         {
+            AVChatSoundPlayer.instance().stop();
 
-//            AVChatSoundPlayer.instance().stop();
-//
-//            if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_BUSY) {
-//
-//                AVChatSoundPlayer.instance().play(AVChatSoundPlayer.RingerTypeEnum.PEER_BUSY);
-//
-//                avChatUI.closeSessions(AVChatExitCode.PEER_BUSY);
-//            } else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_REJECT) {
-//                avChatUI.closeSessions(AVChatExitCode.REJECT);
-//            } else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_AGREE) {
-//                avChatUI.isCallEstablish.set(true);
-//                avChatUI.canSwitchCamera = true;
-//            }
+            if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_BUSY)
+            {
+                AVChatSoundPlayer.instance().play(AVChatSoundPlayer.RingerTypeEnum.PEER_BUSY);
+
+                avChatUI.closeSessions(AVChatExitCode.PEER_BUSY);
+            }
+            else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_REJECT)
+            {
+                avChatUI.closeSessions(AVChatExitCode.REJECT);
+            }
+            else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_AGREE)
+            {
+                avChatUI.isCallEstablish.set(true);
+                avChatUI.canSwitchCamera = true;
+            }
         }
     };
 
@@ -180,19 +237,19 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
         @Override
         public void onEvent(Long chatId)
         {
+            AVChatData info = avChatUI.getAvChatData();
+            if (info != null && info.getChatId() == chatId)
+            {
+                avChatUI.closeSessions(AVChatExitCode.PEER_NO_RESPONSE);
 
-//            AVChatData info = avChatUI.getAvChatData();
-//            if (info != null && info.getChatId() == chatId) {
-//
-//                avChatUI.closeSessions(AVChatExitCode.PEER_NO_RESPONSE);
-//
-//                // 来电超时，自己未接听
-//                if (mIsInComingCall) {
-//                    activeMissCallNotifier();
-//                }
-//
-//                AVChatSoundPlayer.instance().stop();
-//            }
+                // 来电超时，自己未接听
+                if (mIsInComingCall)
+                {
+                    activeMissCallNotifier();
+                }
+
+                AVChatSoundPlayer.instance().stop();
+            }
 
         }
     };
@@ -202,8 +259,8 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
         @Override
         public void onEvent(Integer integer)
         {
-//            AVChatSoundPlayer.instance().stop();
-//            avChatUI.closeSessions(AVChatExitCode.PEER_BUSY);
+            AVChatSoundPlayer.instance().stop();
+            avChatUI.closeSessions(AVChatExitCode.PEER_BUSY);
         }
     };
 
@@ -227,15 +284,15 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
         @Override
         public void onEvent(AVChatCommonEvent avChatHangUpInfo)
         {
-//            AVChatSoundPlayer.instance().stop();
-//
-//            avChatUI.closeSessions(AVChatExitCode.HANGUP);
-//            cancelCallingNotifier();
-//            // 如果是incoming call主叫方挂断，那么通知栏有通知
-//            if (mIsInComingCall && !isCallEstablished)
-//            {
-//                activeMissCallNotifier();
-//            }
+            AVChatSoundPlayer.instance().stop();
+
+            avChatUI.closeSessions(AVChatExitCode.HANGUP);
+            cancelCallingNotifier();
+            // 如果是incoming call主叫方挂断，那么通知栏有通知
+            if (mIsInComingCall && !isCallEstablished)
+            {
+                activeMissCallNotifier();
+            }
         }
     };
 
@@ -247,7 +304,7 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
         @Override
         public void onEvent(AVChatOnlineAckEvent ackInfo)
         {
-            //AVChatSoundPlayer.instance().stop();
+            AVChatSoundPlayer.instance().stop();
 
             String client = null;
             switch (ackInfo.getClientType())
@@ -272,9 +329,68 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
                 String option = ackInfo.getEvent() == AVChatEventType.CALLEE_ONLINE_CLIENT_ACK_AGREE ? "接听！" : "拒绝！";
                 Toast.makeText(AVChatActivity.this, "通话已在" + client + "端被" + option, Toast.LENGTH_SHORT).show();
             }
-            //avChatUI.closeSessions(-1);
+
+            avChatUI.closeSessions(-1);
         }
     };
+
+    /**
+     * 通知栏
+     */
+    private void activeCallingNotifier()
+    {
+        if (notifier != null && !isUserFinish)
+        {
+            notifier.activeCallingNotification(true);
+        }
+    }
+
+    private void cancelCallingNotifier()
+    {
+        if (notifier != null)
+        {
+            notifier.activeCallingNotification(false);
+        }
+    }
+
+    private void activeMissCallNotifier()
+    {
+        if (notifier != null)
+        {
+            notifier.activeMissCallNotification(true);
+        }
+    }
+
+    Observer<StatusCode> userStatusObserver = new Observer<StatusCode>()
+    {
+        @Override
+        public void onEvent(StatusCode code)
+        {
+            if (code.wontAutoLogin())
+            {
+                AVChatSoundPlayer.instance().stop();
+                finish();
+            }
+        }
+    };
+
+    @Override
+    public void finish()
+    {
+        isUserFinish = true;
+        super.finish();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        NIMClient.getService(AuthServiceObserver.class).observeOnlineStatus(userStatusObserver, false);
+        AVChatProfile.getInstance().setAVChatting(false);
+        registerNetCallObserver(false);
+        cancelCallingNotifier();
+        needFinish = true;
+    }
 
     @Override
     public void uiExit()

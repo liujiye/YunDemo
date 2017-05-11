@@ -199,7 +199,7 @@ public class AVChatSurface
          * account 要显示视频的用户帐号
          */
 //        if (DemoCache.getAccount().equals(account)) {
-        if (theApp.ACCOUNT.equals(account)) {
+        if (theApp.TEST3.getAccount().equals(account)) {
             AVChatManager.getInstance().setupLocalVideoRender(largeRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         } else {
             AVChatManager.getInstance().setupRemoteVideoRender(account, largeRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
@@ -223,7 +223,7 @@ public class AVChatSurface
          * account 要显示视频的用户帐号
          */
         //if (DemoCache.getAccount().equals(account)) {
-        if (theApp.ACCOUNT.equals(account)) {
+        if (theApp.TEST3.getAccount().equals(account)) {
             AVChatManager.getInstance().setupLocalVideoRender(smallRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         } else {
             AVChatManager.getInstance().setupRemoteVideoRender(account, smallRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
@@ -376,13 +376,13 @@ public class AVChatSurface
 
         //先取消用户的画布
         //if (DemoCache.getAccount().equals(user1)) {
-        if (theApp.ACCOUNT.equals(user1)) {
+        if (theApp.TEST3.getAccount().equals(user1)) {
             AVChatManager.getInstance().setupLocalVideoRender(null, false, 0);
         } else {
             AVChatManager.getInstance().setupRemoteVideoRender(user1, null, false, 0);
         }
         //if (DemoCache.getAccount().equals(user2)) {
-        if (theApp.ACCOUNT.equals(user2)) {
+        if (theApp.TEST3.getAccount().equals(user2)) {
             AVChatManager.getInstance().setupLocalVideoRender(null, false, 0);
         } else {
             AVChatManager.getInstance().setupRemoteVideoRender(user2, null, false, 0);
@@ -402,13 +402,13 @@ public class AVChatSurface
 
         //重新设置上画布
         //if (user1 == DemoCache.getAccount()) {
-        if (user1 == theApp.ACCOUNT) {
+        if (user1 == theApp.TEST3.getAccount()) {
             AVChatManager.getInstance().setupLocalVideoRender(render1, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         } else {
             AVChatManager.getInstance().setupRemoteVideoRender(user1, render1, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         }
         //if (user2 == DemoCache.getAccount()) {
-        if (user2 == theApp.ACCOUNT) {
+        if (user2 == theApp.TEST3.getAccount()) {
             AVChatManager.getInstance().setupLocalVideoRender(render2, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         } else {
             AVChatManager.getInstance().setupRemoteVideoRender(user2, render2, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);

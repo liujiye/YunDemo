@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
@@ -308,7 +309,7 @@ public class AVChatUI implements AVChatUIListener
                     }
 
 //                    initLargeSurfaceView(DemoCache.getAccount());
-                    initLargeSurfaceView(theApp.ACCOUNT);
+                    initLargeSurfaceView(theApp.TEST3.getAccount());
                     canSwitchCamera = true;
                     onCallStateChange(CallStateEnum.OUTGOING_VIDEO_CALLING);
                 }
@@ -330,6 +331,7 @@ public class AVChatUI implements AVChatUIListener
                 {
                     Toast.makeText(context, R.string.avchat_call_failed, Toast.LENGTH_SHORT).show();
                 }
+                theApp.showToast("avChat call failed code->" + code);
                 closeSessions(-1);
             }
 
@@ -379,25 +381,66 @@ public class AVChatUI implements AVChatUIListener
     public void closeSessions(int exitCode)
     {
         //not  user  hang up active  and warning tone is playing,so wait its end
-//        Log.i(TAG, "close session -> " + AVChatExitCode.getExitString(exitCode));
+        Log.i(TAG, "close session -> " + AVChatExitCode.getExitString(exitCode));
 //        if (avChatAudio != null)
 //            avChatAudio.closeSession(exitCode);
 //        if (avChatVideo != null)
 //            avChatVideo.closeSession(exitCode);
-        //showQuitToast(exitCode);
+        showQuitToast(exitCode);
         isCallEstablish.set(false);
         canSwitchCamera = false;
         isClosedCamera = false;
         aVChatListener.uiExit();
     }
 
+    /**
+     * 给出结束的提醒
+     *
+     * @param code
+     */
+    public void showQuitToast(int code)
+    {
+        switch (code)
+        {
+        case AVChatExitCode.NET_CHANGE: // 网络切换
+        case AVChatExitCode.NET_ERROR: // 网络异常
+        case AVChatExitCode.CONFIG_ERROR: // 服务器返回数据错误
+            Toast.makeText(context, R.string.avchat_net_error_then_quit, Toast.LENGTH_SHORT).show();
+            break;
+        case AVChatExitCode.PEER_HANGUP:
+        case AVChatExitCode.HANGUP:
+            if (isCallEstablish.get())
+            {
+                Toast.makeText(context, R.string.avchat_call_finish, Toast.LENGTH_SHORT).show();
+            }
+            break;
+        case AVChatExitCode.PEER_BUSY:
+            Toast.makeText(context, R.string.avchat_peer_busy, Toast.LENGTH_SHORT).show();
+            break;
+        case AVChatExitCode.PROTOCOL_INCOMPATIBLE_PEER_LOWER:
+            Toast.makeText(context, R.string.avchat_peer_protocol_low_version, Toast.LENGTH_SHORT).show();
+            break;
+        case AVChatExitCode.PROTOCOL_INCOMPATIBLE_SELF_LOWER:
+            Toast.makeText(context, R.string.avchat_local_protocol_low_version, Toast.LENGTH_SHORT).show();
+            break;
+        case AVChatExitCode.INVALIDE_CHANNELID:
+            Toast.makeText(context, R.string.avchat_invalid_channel_id, Toast.LENGTH_SHORT).show();
+            break;
+        case AVChatExitCode.LOCAL_CALL_BUSY:
+            Toast.makeText(context, R.string.avchat_local_call_busy, Toast.LENGTH_SHORT).show();
+            break;
+        default:
+            break;
+        }
+    }
 
-
-    public void peerVideoOff() {
+    public void peerVideoOff()
+    {
         avChatSurface.peerVideoOff();
     }
 
-    public void peerVideoOn() {
+    public void peerVideoOn()
+    {
         avChatSurface.peerVideoOn();
     }
 
@@ -406,13 +449,16 @@ public class AVChatUI implements AVChatUIListener
     private boolean needRestoreLocalAudio = false;
 
     //恢复视频和语音发送
-    public void resumeVideo() {
-        if (needRestoreLocalVideo) {
+    public void resumeVideo()
+    {
+        if (needRestoreLocalVideo)
+        {
             AVChatManager.getInstance().muteLocalVideo(false);
             needRestoreLocalVideo = false;
         }
 
-        if (needRestoreLocalAudio) {
+        if (needRestoreLocalAudio)
+        {
             AVChatManager.getInstance().muteLocalAudio(false);
             needRestoreLocalAudio = false;
         }
@@ -420,50 +466,61 @@ public class AVChatUI implements AVChatUIListener
     }
 
     //关闭视频和语音发送.
-    public void pauseVideo() {
+    public void pauseVideo()
+    {
 
-        if (!AVChatManager.getInstance().isLocalVideoMuted()) {
+        if (!AVChatManager.getInstance().isLocalVideoMuted())
+        {
             AVChatManager.getInstance().muteLocalVideo(true);
             needRestoreLocalVideo = true;
         }
 
-        if (!AVChatManager.getInstance().isLocalAudioMuted()) {
+        if (!AVChatManager.getInstance().isLocalAudioMuted())
+        {
             AVChatManager.getInstance().muteLocalAudio(true);
             needRestoreLocalAudio = true;
         }
     }
 
-    public boolean canSwitchCamera() {
+    public boolean canSwitchCamera()
+    {
         return canSwitchCamera;
     }
 
-    public CallStateEnum getCallingState() {
+    public CallStateEnum getCallingState()
+    {
         return callingState;
     }
 
-    public String getVideoAccount() {
+    public String getVideoAccount()
+    {
         return videoAccount;
     }
 
-    public void setVideoAccount(String videoAccount) {
+    public void setVideoAccount(String videoAccount)
+    {
         this.videoAccount = videoAccount;
     }
 
-    public String getAccount() {
+    public String getAccount()
+    {
         if (receiverId != null)
             return receiverId;
         return null;
     }
 
-    public long getTimeBase() {
+    public long getTimeBase()
+    {
         return timeBase;
     }
 
-    public void setTimeBase(long timeBase) {
+    public void setTimeBase(long timeBase)
+    {
         this.timeBase = timeBase;
     }
 
-    public AVChatData getAvChatData() {
+    public AVChatData getAvChatData()
+    {
         return avChatData;
     }
 

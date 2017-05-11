@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.multidex.MultiDex;
 
+import com.demo.yun.entity.Account;
 import com.demo.yun.util.UIUtil;
 import com.demo.yun.util.YunXinUtil;
 import com.demo.yun.util.sys.SystemUtil;
@@ -18,9 +19,12 @@ import com.netease.nimlib.sdk.NIMClient;
 public class theApp extends Application
 {
     public static Context CONTEXT;
-    public static final String ACCOUNT = "test003";
-    public static final String TOKEN = "1c641f3af395c4734afe3786ba818d63";
+    public static final Account TEST3 = new Account("test003", "1c641f3af395c4734afe3786ba818d63");
+    public static final Account TEST4 = new Account("test004", "e4c34b0e582ae5f59e1d417cb87a824f");
+//    public static final String ACCOUNT = "test003";
+//    public static final String TOKEN = "1c641f3af395c4734afe3786ba818d63";
 
+    @Override
     protected void attachBaseContext(Context newBase)
     {
         super.attachBaseContext(newBase);
