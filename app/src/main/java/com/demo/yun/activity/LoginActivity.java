@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity
 {
-    private Account mCurAccount = theApp.TEST3;
+    private Account mCurAccount = theApp.getCurAccount();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,11 +53,11 @@ public class LoginActivity extends AppCompatActivity
                     onChat();
                     break;
                 case R.id.rdo_test3:
-                    toggleButtonEnable(true);
+                    onLoginResult(false);
                     mCurAccount = theApp.TEST3;
                     break;
                 case R.id.rdo_test4:
-                    toggleButtonEnable(true);
+                    onLoginResult(false);
                     mCurAccount = theApp.TEST4;
                     break;
                 case R.id.btn_main:
@@ -139,10 +139,16 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
-    private void toggleButtonEnable(boolean enable)
+    /**
+     * 登录结果处理UI
+     * @param succeed 成功还是失败
+     */
+    private void onLoginResult(boolean succeed)
     {
-        findViewById(R.id.btn_login).setEnabled(enable);
-        findViewById(R.id.btn_chat).setEnabled(!enable);
+        findViewById(R.id.btn_login).setEnabled(succeed);
+        findViewById(R.id.btn_chat).setEnabled(!succeed);
+
+        theApp.setCurAccount(succeed ? mCurAccount : null);
     }
 
     private void onYunXinLogin(Account account)
@@ -166,7 +172,7 @@ public class LoginActivity extends AppCompatActivity
                             AppData.setYunXinAccount(loginInfo.getAccount());
                             AppData.setYunXinToken(loginInfo.getToken());
 
-                            toggleButtonEnable(false);
+                            onLoginResult(true);
                         }
 
                         @Override

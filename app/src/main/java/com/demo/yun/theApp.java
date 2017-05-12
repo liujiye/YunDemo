@@ -19,10 +19,14 @@ import com.netease.nimlib.sdk.NIMClient;
 public class theApp extends Application
 {
     public static Context CONTEXT;
-    public static final Account TEST3 = new Account("test003", "1c641f3af395c4734afe3786ba818d63");
-    public static final Account TEST4 = new Account("test004", "e4c34b0e582ae5f59e1d417cb87a824f");
-//    public static final String ACCOUNT = "test003";
-//    public static final String TOKEN = "1c641f3af395c4734afe3786ba818d63";
+    // likechat账号
+    //public static final Account TEST3 = new Account("test003", "1c641f3af395c4734afe3786ba818d63");
+    //public static final Account TEST4 = new Account("test004", "e4c34b0e582ae5f59e1d417cb87a824f");
+    // 云信账号, token使用123456的MD5值
+    public static final Account TEST3 = new Account("liu1501134", "e10adc3949ba59abbe56e057f20f883e");
+    public static final Account TEST4 = new Account("18178619319", "e10adc3949ba59abbe56e057f20f883e");
+
+    private static Account mCurAccount = TEST3;
 
     @Override
     protected void attachBaseContext(Context newBase)
@@ -43,6 +47,16 @@ public class theApp extends Application
             //YunXinUtil.init();
             NimUIKit.init(this);
         }
+    }
+
+    public static Account getCurAccount()
+    {
+        return mCurAccount;
+    }
+
+    public static void setCurAccount(Account account)
+    {
+        mCurAccount = account;
     }
 
     public boolean inMainProcess()

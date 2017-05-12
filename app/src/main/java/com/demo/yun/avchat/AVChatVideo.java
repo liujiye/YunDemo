@@ -9,11 +9,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.demo.yun.R;
+import com.demo.yun.avchat.widget.ToggleListener;
+import com.demo.yun.avchat.widget.ToggleState;
+import com.demo.yun.avchat.widget.ToggleView;
 import com.demo.yun.constant.CallStateEnum;
 import com.demo.yun.theApp;
-import com.demo.yun.widget.ToggleListener;
-import com.demo.yun.widget.ToggleState;
-import com.demo.yun.widget.ToggleView;
 import com.netease.nim.uikit.cache.NimUserInfoCache;
 import com.netease.nim.uikit.common.ui.imageview.HeadImageView;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
@@ -179,7 +179,7 @@ public class AVChatVideo implements View.OnClickListener, ToggleListener
     private void showProfile()
     {
         //String account = manager.getAccount();
-        String account = theApp.TEST3.getAccount();
+        String account = theApp.getCurAccount().getAccount();
         headImg.loadBuddyAvatar(account);
         nickNameTV.setText(NimUserInfoCache.getInstance().getUserDisplayName(account));
     }

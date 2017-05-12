@@ -65,7 +65,8 @@ public class AVChatSurface
     private String largeAccount; // 显示在大图像的用户id
     private String smallAccount; // 显示在小图像的用户id
 
-    public AVChatSurface(Context context, AVChatUI manager, View surfaceRoot) {
+    public AVChatSurface(Context context, AVChatUI manager, View surfaceRoot)
+    {
         this.context = context;
         this.manager = manager;
         this.surfaceRoot = surfaceRoot;
@@ -74,10 +75,12 @@ public class AVChatSurface
         this.largeRender = new AVChatVideoRender(context);
     }
 
-    private void findViews() {
+    private void findViews()
+    {
         if (init)
             return;
-        if (surfaceRoot != null) {
+        if (surfaceRoot != null)
+        {
 
             smallSizePreviewFrameLayout = (FrameLayout) surfaceRoot.findViewById(R.id.small_size_preview_layout);
             smallSizePreviewLayout = (LinearLayout) surfaceRoot.findViewById(R.id.small_size_preview);
@@ -91,97 +94,118 @@ public class AVChatSurface
         }
     }
 
-    private View.OnTouchListener touchListener = new View.OnTouchListener() {
+    private View.OnTouchListener touchListener = new View.OnTouchListener()
+    {
         @Override
-        public boolean onTouch(final View v, MotionEvent event) {
+        public boolean onTouch(final View v, MotionEvent event)
+        {
             int x = (int) event.getRawX();
             int y = (int) event.getRawY();
 
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    lastX = x;
-                    lastY = y;
-                    int[] p = new int[2];
-                    smallSizePreviewFrameLayout.getLocationOnScreen(p);
-                    inX = x - p[0];
-                    inY = y - p[1];
+            switch (event.getAction())
+            {
+            case MotionEvent.ACTION_DOWN:
+                lastX = x;
+                lastY = y;
+                int[] p = new int[2];
+                smallSizePreviewFrameLayout.getLocationOnScreen(p);
+                inX = x - p[0];
+                inY = y - p[1];
 
+                break;
+            case MotionEvent.ACTION_MOVE:
+                final int diff = Math.max(Math.abs(lastX - x), Math.abs(lastY - y));
+                if (diff < TOUCH_SLOP)
                     break;
-                case MotionEvent.ACTION_MOVE:
-                    final int diff = Math.max(Math.abs(lastX - x), Math.abs(lastY - y));
-                    if (diff < TOUCH_SLOP)
-                        break;
 
-                    if (paddingRect == null) {
-                        paddingRect = new Rect(ScreenUtil.dip2px(10), ScreenUtil.dip2px(20), ScreenUtil.dip2px(10),
-                                ScreenUtil.dip2px(70));
+                if (paddingRect == null)
+                {
+                    paddingRect = new Rect(ScreenUtil.dip2px(10), ScreenUtil.dip2px(20), ScreenUtil.dip2px(10),
+                            ScreenUtil.dip2px(70));
+                }
+
+                int destX, destY;
+                if (x - inX <= paddingRect.left)
+                {
+                    destX = paddingRect.left;
+                }
+                else if (x - inX + v.getWidth() >= ScreenUtil.screenWidth - paddingRect.right)
+                {
+                    destX = ScreenUtil.screenWidth - v.getWidth() - paddingRect.right;
+                }
+                else
+                {
+                    destX = x - inX;
+                }
+
+                if (y - inY <= paddingRect.top)
+                {
+                    destY = paddingRect.top;
+                }
+                else if (y - inY + v.getHeight() >= ScreenUtil.screenHeight - paddingRect.bottom)
+                {
+                    destY = ScreenUtil.screenHeight - v.getHeight() - paddingRect.bottom;
+                }
+                else
+                {
+                    destY = y - inY;
+                }
+
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) v.getLayoutParams();
+                params.gravity = Gravity.NO_GRAVITY;
+                params.leftMargin = destX;
+                params.topMargin = destY;
+                v.setLayoutParams(params);
+
+                break;
+            case MotionEvent.ACTION_UP:
+                if (Math.max(Math.abs(lastX - x), Math.abs(lastY - y)) <= 5)
+                {
+                    if (largeAccount == null || smallAccount == null)
+                    {
+                        return true;
                     }
+                    String temp;
+                    switchRender(smallAccount, largeAccount);
+                    temp = largeAccount;
+                    largeAccount = smallAccount;
+                    smallAccount = temp;
+                    switchAndSetLayout();
+                }
+                else
+                {
 
-                    int destX, destY;
-                    if (x - inX <= paddingRect.left) {
-                        destX = paddingRect.left;
-                    } else if (x - inX + v.getWidth() >= ScreenUtil.screenWidth - paddingRect.right) {
-                        destX = ScreenUtil.screenWidth - v.getWidth() - paddingRect.right;
-                    } else {
-                        destX = x - inX;
-                    }
+                }
 
-                    if (y - inY <= paddingRect.top) {
-                        destY = paddingRect.top;
-                    } else if (y - inY + v.getHeight() >= ScreenUtil.screenHeight - paddingRect.bottom) {
-                        destY = ScreenUtil.screenHeight - v.getHeight() - paddingRect.bottom;
-                    } else {
-                        destY = y - inY;
-                    }
-
-                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) v.getLayoutParams();
-                    params.gravity = Gravity.NO_GRAVITY;
-                    params.leftMargin = destX;
-                    params.topMargin = destY;
-                    v.setLayoutParams(params);
-
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (Math.max(Math.abs(lastX - x), Math.abs(lastY - y)) <= 5) {
-                        if (largeAccount == null || smallAccount == null) {
-                            return true;
-                        }
-                        String temp;
-                        switchRender(smallAccount, largeAccount);
-                        temp = largeAccount;
-                        largeAccount = smallAccount;
-                        smallAccount = temp;
-                        switchAndSetLayout();
-                    } else {
-
-                    }
-
-                    break;
+                break;
             }
 
             return true;
         }
     };
 
-    public void onCallStateChange(CallStateEnum state) {
+    public void onCallStateChange(CallStateEnum state)
+    {
         if (CallStateEnum.isVideoMode(state))
             findViews();
-        switch (state) {
-            case VIDEO:
-                largeSizePreviewCoverLayout.setVisibility(View.GONE);
-                break;
-            case OUTGOING_AUDIO_TO_VIDEO:
-                showNotificationLayout(AUDIO_TO_VIDEO_WAIT);
-                break;
-            case INCOMING_AUDIO_TO_VIDEO:
-                break;
-            case AUDIO:
-                if(smallSizePreviewFrameLayout != null) {
-                    smallSizePreviewFrameLayout.setVisibility(View.INVISIBLE);
-                }
-                break;
-            default:
-                break;
+        switch (state)
+        {
+        case VIDEO:
+            largeSizePreviewCoverLayout.setVisibility(View.GONE);
+            break;
+        case OUTGOING_AUDIO_TO_VIDEO:
+            showNotificationLayout(AUDIO_TO_VIDEO_WAIT);
+            break;
+        case INCOMING_AUDIO_TO_VIDEO:
+            break;
+        case AUDIO:
+            if (smallSizePreviewFrameLayout != null)
+            {
+                smallSizePreviewFrameLayout.setVisibility(View.INVISIBLE);
+            }
+            break;
+        default:
+            break;
         }
         setSurfaceRoot(CallStateEnum.isVideoMode(state));
     }
@@ -191,7 +215,8 @@ public class AVChatSurface
      *
      * @param account 显示视频的用户id
      */
-    public void initLargeSurfaceView(String account) {
+    public void initLargeSurfaceView(String account)
+    {
         largeAccount = account;
         findViews();
         /**
@@ -199,9 +224,12 @@ public class AVChatSurface
          * account 要显示视频的用户帐号
          */
 //        if (DemoCache.getAccount().equals(account)) {
-        if (theApp.TEST3.getAccount().equals(account)) {
+        if (theApp.getCurAccount().getAccount().equals(account))
+        {
             AVChatManager.getInstance().setupLocalVideoRender(largeRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
-        } else {
+        }
+        else
+        {
             AVChatManager.getInstance().setupRemoteVideoRender(account, largeRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         }
         addIntoLargeSizePreviewLayout(largeRender);
@@ -214,7 +242,8 @@ public class AVChatSurface
      * @param account
      * @return
      */
-    public void initSmallSurfaceView(String account) {
+    public void initSmallSurfaceView(String account)
+    {
         smallAccount = account;
         findViews();
         smallSizePreviewFrameLayout.setVisibility(View.VISIBLE);
@@ -223,9 +252,12 @@ public class AVChatSurface
          * account 要显示视频的用户帐号
          */
         //if (DemoCache.getAccount().equals(account)) {
-        if (theApp.TEST3.getAccount().equals(account)) {
+        if (theApp.getCurAccount().getAccount().equals(account))
+        {
             AVChatManager.getInstance().setupLocalVideoRender(smallRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
-        } else {
+        }
+        else
+        {
             AVChatManager.getInstance().setupRemoteVideoRender(account, smallRender, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         }
         addIntoSmallSizePreviewLayout(smallRender);
@@ -238,13 +270,16 @@ public class AVChatSurface
      *
      * @param surfaceView
      */
-    private void addIntoLargeSizePreviewLayout(SurfaceView surfaceView) {
-        if (surfaceView.getParent() != null) {
+    private void addIntoLargeSizePreviewLayout(SurfaceView surfaceView)
+    {
+        if (surfaceView.getParent() != null)
+        {
             ((ViewGroup) surfaceView.getParent()).removeView(surfaceView);
         }
         largeSizePreviewLayout.addView(surfaceView);
         surfaceView.setZOrderMediaOverlay(false);
-        if (manager.getCallingState() == CallStateEnum.VIDEO || manager.getCallingState() == CallStateEnum.OUTGOING_VIDEO_CALLING) {
+        if (manager.getCallingState() == CallStateEnum.VIDEO || manager.getCallingState() == CallStateEnum.OUTGOING_VIDEO_CALLING)
+        {
             largeSizePreviewCoverLayout.setVisibility(View.GONE);
         }
     }
@@ -252,9 +287,11 @@ public class AVChatSurface
     /**
      * 添加surfaceview到smallSizePreviewLayout
      */
-    private void addIntoSmallSizePreviewLayout(SurfaceView surfaceView) {
+    private void addIntoSmallSizePreviewLayout(SurfaceView surfaceView)
+    {
         smallSizePreviewCoverImg.setVisibility(View.GONE);
-        if (surfaceView.getParent() != null) {
+        if (surfaceView.getParent() != null)
+        {
             ((ViewGroup) surfaceView.getParent()).removeView(surfaceView);
         }
         smallSizePreviewLayout.addView(surfaceView);
@@ -265,18 +302,23 @@ public class AVChatSurface
     /**
      * 关闭小窗口
      */
-    private void closeSmallSizePreview() {
+    private void closeSmallSizePreview()
+    {
         smallSizePreviewCoverImg.setVisibility(View.VISIBLE);
     }
 
     /**
      * 对方打开了摄像头
      */
-    public void peerVideoOn() {
+    public void peerVideoOn()
+    {
         isPeerVideoOff = false;
-        if (localPreviewInSmallSize) {
+        if (localPreviewInSmallSize)
+        {
             largeSizePreviewCoverLayout.setVisibility(View.GONE);
-        } else {
+        }
+        else
+        {
             smallSizePreviewCoverImg.setVisibility(View.GONE);
         }
     }
@@ -284,11 +326,15 @@ public class AVChatSurface
     /**
      * 对方关闭了摄像头
      */
-    public void peerVideoOff() {
+    public void peerVideoOff()
+    {
         isPeerVideoOff = true;
-        if (localPreviewInSmallSize) { //local preview in small size layout, then peer preview should in large size layout
+        if (localPreviewInSmallSize)
+        { //local preview in small size layout, then peer preview should in large size layout
             showNotificationLayout(PEER_CLOSE_CAMERA);
-        } else {  // peer preview in small size layout
+        }
+        else
+        {  // peer preview in small size layout
             closeSmallSizePreview();
         }
     }
@@ -296,11 +342,15 @@ public class AVChatSurface
     /**
      * 对方打开了摄像头
      */
-    public void localVideoOn() {
+    public void localVideoOn()
+    {
         isLocalVideoOff = false;
-        if (localPreviewInSmallSize) {
+        if (localPreviewInSmallSize)
+        {
             smallSizePreviewCoverImg.setVisibility(View.GONE);
-        } else {
+        }
+        else
+        {
             largeSizePreviewCoverLayout.setVisibility(View.GONE);
         }
     }
@@ -308,7 +358,8 @@ public class AVChatSurface
     /**
      * 本地关闭了摄像头
      */
-    public void localVideoOff() {
+    public void localVideoOff()
+    {
         isLocalVideoOff = true;
         if (localPreviewInSmallSize)
             closeSmallSizePreview();
@@ -319,14 +370,17 @@ public class AVChatSurface
     /**
      * 摄像头切换时，布局显隐
      */
-    private void switchAndSetLayout() {
+    private void switchAndSetLayout()
+    {
         localPreviewInSmallSize = !localPreviewInSmallSize;
         largeSizePreviewCoverLayout.setVisibility(View.GONE);
         smallSizePreviewCoverImg.setVisibility(View.GONE);
-        if (isPeerVideoOff) {
+        if (isPeerVideoOff)
+        {
             peerVideoOff();
         }
-        if (isLocalVideoOff) {
+        if (isLocalVideoOff)
+        {
             localVideoOff();
         }
     }
@@ -336,23 +390,26 @@ public class AVChatSurface
      *
      * @param closeType
      */
-    private void showNotificationLayout(int closeType) {
-        if(largeSizePreviewCoverLayout == null) {
+    private void showNotificationLayout(int closeType)
+    {
+        if (largeSizePreviewCoverLayout == null)
+        {
             return;
         }
         TextView textView = (TextView) largeSizePreviewCoverLayout;
-        switch (closeType) {
-            case PEER_CLOSE_CAMERA:
-                textView.setText(R.string.avchat_peer_close_camera);
-                break;
-            case LOCAL_CLOSE_CAMERA:
-                textView.setText(R.string.avchat_local_close_camera);
-                break;
-            case AUDIO_TO_VIDEO_WAIT:
-                textView.setText(R.string.avchat_audio_to_video_wait);
-                break;
-            default:
-                return;
+        switch (closeType)
+        {
+        case PEER_CLOSE_CAMERA:
+            textView.setText(R.string.avchat_peer_close_camera);
+            break;
+        case LOCAL_CLOSE_CAMERA:
+            textView.setText(R.string.avchat_local_close_camera);
+            break;
+        case AUDIO_TO_VIDEO_WAIT:
+            textView.setText(R.string.avchat_audio_to_video_wait);
+            break;
+        default:
+            return;
         }
         largeSizePreviewCoverLayout.setVisibility(View.VISIBLE);
     }
@@ -362,7 +419,8 @@ public class AVChatSurface
      *
      * @param visible
      */
-    private void setSurfaceRoot(boolean visible) {
+    private void setSurfaceRoot(boolean visible)
+    {
         surfaceRoot.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
@@ -372,19 +430,26 @@ public class AVChatSurface
      * @param user1 用户1的account
      * @param user2 用户2的account
      */
-    private void switchRender(String user1, String user2) {
+    private void switchRender(String user1, String user2)
+    {
 
         //先取消用户的画布
         //if (DemoCache.getAccount().equals(user1)) {
-        if (theApp.TEST3.getAccount().equals(user1)) {
+        if (theApp.getCurAccount().getAccount().equals(user1))
+        {
             AVChatManager.getInstance().setupLocalVideoRender(null, false, 0);
-        } else {
+        }
+        else
+        {
             AVChatManager.getInstance().setupRemoteVideoRender(user1, null, false, 0);
         }
         //if (DemoCache.getAccount().equals(user2)) {
-        if (theApp.TEST3.getAccount().equals(user2)) {
+        if (theApp.getCurAccount().getAccount().equals(user2))
+        {
             AVChatManager.getInstance().setupLocalVideoRender(null, false, 0);
-        } else {
+        }
+        else
+        {
             AVChatManager.getInstance().setupRemoteVideoRender(user2, null, false, 0);
         }
         //交换画布
@@ -392,25 +457,34 @@ public class AVChatSurface
         //目前只有两个用户,并且认为这两个account肯定是对的
         AVChatVideoRender render1;
         AVChatVideoRender render2;
-        if(user1.equals(smallAccount)) {
+        if (user1.equals(smallAccount))
+        {
             render1 = largeRender;
             render2 = smallRender;
-        } else {
+        }
+        else
+        {
             render1 = smallRender;
             render2 = largeRender;
         }
 
         //重新设置上画布
         //if (user1 == DemoCache.getAccount()) {
-        if (user1 == theApp.TEST3.getAccount()) {
+        if (user1 == theApp.getCurAccount().getAccount())
+        {
             AVChatManager.getInstance().setupLocalVideoRender(render1, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
-        } else {
+        }
+        else
+        {
             AVChatManager.getInstance().setupRemoteVideoRender(user1, render1, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         }
         //if (user2 == DemoCache.getAccount()) {
-        if (user2 == theApp.TEST3.getAccount()) {
+        if (user2 == theApp.getCurAccount().getAccount())
+        {
             AVChatManager.getInstance().setupLocalVideoRender(render2, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
-        } else {
+        }
+        else
+        {
             AVChatManager.getInstance().setupRemoteVideoRender(user2, render2, false, AVChatVideoScalingType.SCALE_ASPECT_BALANCED);
         }
     }
@@ -420,7 +494,8 @@ public class AVChatSurface
      *
      * @return
      */
-    public boolean isLocalPreviewInSmallSize() {
+    public boolean isLocalPreviewInSmallSize()
+    {
         return localPreviewInSmallSize;
     }
 }
