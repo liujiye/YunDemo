@@ -145,8 +145,8 @@ public class LoginActivity extends AppCompatActivity
      */
     private void onLoginResult(boolean succeed)
     {
-        findViewById(R.id.btn_login).setEnabled(succeed);
-        findViewById(R.id.btn_chat).setEnabled(!succeed);
+        findViewById(R.id.btn_login).setEnabled(!succeed);
+        findViewById(R.id.btn_chat).setEnabled(succeed);
 
         theApp.setCurAccount(succeed ? mCurAccount : null);
     }
