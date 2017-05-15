@@ -10,6 +10,7 @@ import com.demo.yun.avchat.AVChatActivity;
 import com.demo.yun.avchat.AVChatProfile;
 import com.demo.yun.avchat.receiver.PhoneCallStateObserver;
 import com.demo.yun.entity.Account;
+import com.demo.yun.session.SessionHelper;
 import com.demo.yun.util.UIUtil;
 import com.demo.yun.util.YunXinUtil;
 import com.demo.yun.util.sys.SystemUtil;
@@ -65,6 +66,9 @@ public class theApp extends Application
         {
             //YunXinUtil.init();
             NimUIKit.init(this);
+            
+            // 会话窗口的定制初始化。
+            SessionHelper.init();
 
             // 注册通知消息过滤器
             registerIMMessageFilter();
