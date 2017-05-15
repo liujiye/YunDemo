@@ -96,6 +96,23 @@ public class AVChatActivity extends Activity implements AVChatUI.AVChatListener,
         context.startActivity(intent);
     }
 
+    /**
+     * incoming call
+     *
+     * @param context
+     */
+    public static void launch(Context context, AVChatData config, int source)
+    {
+        needFinish = false;
+        Intent intent = new Intent();
+        intent.setClass(context, AVChatActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(KEY_CALL_CONFIG, config);
+        intent.putExtra(KEY_IN_CALLING, true);
+        intent.putExtra(KEY_SOURCE, source);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
